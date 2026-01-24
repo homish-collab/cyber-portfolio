@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSTEM_CORE | V3.0 Final Build</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Monoton&family=Open+Sans:wght@400;700&display=swap');
+
+        :root {
+            --bg-dark: #0a0b10;
+            --neon-cyan: #00f2ff;
+            --neon-magenta: #ff00ff;
+            --text-main: #e6edf3;
+            --glass-bg: rgba(22, 27, 34, 0.9);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Open Sans', sans-serif;
+            overflow-x: hidden;
+            border: 1px solid var(--neon-cyan);
+        }
+
+        /* --- HERO & BACKGROUND --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                        rgba(0, 242, 255, 0.1) 0%, transparent 60%),
+                        linear-gradient(to bottom, rgba(10, 11, 16, 0.4), var(--bg-dark)),
+                        url('https://w.wallhaven.cc/full/1q/wallhaven-1q83qg.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .highlight { font-family: 'Bree Serif'; font-size: 3.5rem; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); z-index: 5; }
+        #status-msg { font-family: monospace; color: var(--neon-cyan); margin: 20px; z-index: 5; }
+
+        /* --- 3D ROTATION --- */
+        #projects-scene {
+            display: none;
+            width: 100%;
+            height: 400px;
+            perspective: 1200px;
+            cursor: grab;
+            z-index: 5;
+        }
+
+        .carousel-3d {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
+        .project-card {
+            position: absolute; left: 50%; top: 50%;
+            width: 300px; height: 200px;
+            margin-left: -150px; margin-top: -100px;
+            background: var(--glass-bg);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 25px;
+            backface-visibility: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            pointer-events: none;
+        }
+
+        .card-1 { transform: rotateY(0deg) translateZ(400px); }
+        .card-2 { transform: rotateY(120deg) translateZ(400px); }
+        .card-3 { transform: rotateY(240deg) translateZ(400px); }
+
+        /* --- CHAT BOT --- */
+        #chat-toggle {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 12px 20px; background: var(--bg-dark);
+            border: 2px solid var(--neon-cyan); color: var(--neon-cyan);
+            cursor: pointer; z-index: 1000; font-family: monospace;
+        }
+
+        #chat-window {
+            position: fixed; bottom: 80px; right: 20px;
+            width: 300px; height: 350px;
+            background: var(--glass-bg); border: 1px solid var(--neon-magenta);
+            display: none; flex-direction: column; z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        #chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; }
+        .bot-msg { color: var(--neon-cyan); margin-bottom: 8px; }
+        .user-msg { color: var(--neon-magenta); margin-bottom: 8px; text-align: right; }
+
+        #chat-input-area { display: flex; border-top: 1px solid #333; }
+        #chat-input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; }
+        #send-btn { background: var(--neon-cyan); border: none; padding: 0 10px; cursor: pointer; }
+
+        #cta-btn {
+            padding: 15px 40px; background: transparent;
+            border: 2px solid var(--neon-magenta); color: var(--neon-magenta);
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
+            transition: 0.3s; z-index: 10;
+        }
+
+        #cta-btn:hover { background: var(--neon-magenta); color: white; box-shadow: 0 0 30px var(--neon-magenta); }
+
+        @media (max-width: 768px) {
+            .card-1 { transform: rotateY(0deg) translateZ(250px); }
+            .card-2 { transform: rotateY(120deg) translateZ(250px); }
+            .card-3 { transform: rotateY(240deg) translateZ(250px); }
+        }
+    </style>
+    <script src="https://unpkg.com/compromise"></script>
+</head>
+<body>
+
+    <section class="hero">
+        <h1 class="highlight">I AM A <span id="typewriter"></span></h1>
+        <div id="status-msg"></div>
+        <button id="cta-btn">Initialize System</button>
+
+        <div id="projects-scene">
+            <div class="carousel-3d" id="carousel">
+                <div class="project-card card-1">
+                    <h3>NEURAL_SYNC</h3>
+                    <p>Real-time biometric data streaming dashboard.</p>
+                </div>
+                <div class="project-card card-2">
+                    <h3>CYBER_MARKET</h3>
+                    <p>Encrypted P2P trading node interface.</p>
+                </div>
+                <div class="project-card card-3">
+                    <h3>DATA_GHOST</h3>
+                    <p>Stealth protocol for digital asset protection.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <button id="chat-toggle">💬 SYS_COMMS</button>
+    <div id="chat-window" id="chatWindow">
+        <div style="background:var(--neon-magenta); padding:5px; font-size:0.7rem;">TERMINAL_CHAT v1.0</div>
+        <div id="chat-messages">
+            <div class="bot-msg">SYS: Connection secure. How can I assist?</div>
+        </div>
+        <div id="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Try: skills, contact...">
+            <button id="send-btn">SEND</button>
+        </div>
+    </div>
+
+    <script>
+  const phrases = ["DEVELOPER", "UI DESIGNER", "CYBER ARCHITECT"];
+        let pIdx = 0, cIdx = 0, isDeleting = false;
+        function type() {
+            const el = document.getElementById('typewriter');
+            const current = phrases[pIdx];
+            el.textContent = isDeleting ? current.substring(0, cIdx--) : current.substring(0, cIdx++);
+            if (!isDeleting && cIdx > current.length) { isDeleting = true; setTimeout(type, 2000); }
+            else if (isDeleting && cIdx === 0) { isDeleting = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(type, 500); }
+            else setTimeout(type, isDeleting ? 50 : 150);
+        }
+
+        // 2. CHAT BOT LOGIC
+        const botKnowledge = {
+            "skills": "I specialize in JavaScript, React, 3D CSS, and UI/UX architecture.",
+            "contact": "You can reach the core via encrypted mail at: dev@system-core.io",
+            "missions": "Check the 3D grid for my current active missions.",
+            "hi": "Greetings, traveler. Connection stable."
+        };
+
+        async function botReply(text) {
+    const messages = document.getElementById('chat-messages');
+    
+    // 1. Create the Bot Message Container
+    const botDiv = document.createElement('div');
+    botDiv.className = "bot-msg";
+    botDiv.innerHTML = "SYS: CONNECTING_TO_CORE...";
+    messages.appendChild(botDiv);
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+        // 2. Call your Serverless API (The one we'll host on Vercel/Netlify)
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+
+        const data = await response.json();
+        const aiResponse = data.reply; // This is the text from ChatGPT
+
+        // 3. Typewriter effect for the AI response
+        botDiv.innerHTML = "SYS: ";
+        let i = 0;
+        const interval = setInterval(() => {
+            botDiv.innerHTML += aiResponse.charAt(i++);
+            if (i >= aiResponse.length) {
+                clearInterval(interval);
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }, 15);
+
+    } catch (err) {
+        botDiv.innerHTML = "SYS: ERROR_UPLINK_FAILED. LOCAL_MODE_ACTIVE.";
+    }
+}
+
+        // 3. INITIALIZATION
+        document.addEventListener('DOMContentLoaded', () => {
+            type();
+            const hero = document.querySelector('.hero');
+            const btn = document.getElementById('cta-btn');
+            const scene = document.getElementById('projects-scene');
+            const carousel = document.getElementById('carousel');
+
+            // Mouse Glow
+            window.addEventListener('mousemove', (e) => {
+                hero.style.setProperty('--mouse-x', `${(e.clientX/window.innerWidth)*100}%`);
+                hero.style.setProperty('--mouse-y', `${(e.clientY/window.innerHeight)*100}%`);
+            });
+
+            // Initialize Button
+            btn.onclick = () => {
+                btn.style.display = 'none';
+                document.getElementById('status-msg').innerText = "> Initializing 3D Orbital Grid...";
+                setTimeout(() => {
+                    document.getElementById('status-msg').style.display = 'none';
+                    scene.style.display = 'block';
+                }, 1500);
+            };
+
+            // 3D User Rotation
+            let isDragging = false, startX = 0, rotation = 0;
+            const start = (e) => { isDragging = true; startX = e.pageX || e.touches[0].pageX; };
+            const move = (e) => {
+                if (!isDragging) return;
+                const x = e.pageX || e.touches[0].pageX;
+                const walk = (x - startX) * 0.4;
+                carousel.style.transform = `rotateY(${rotation + walk}deg)`;
+                targetRot = rotation + walk;
+            };
+            const end = () => { isDragging = false; rotation = targetRot; };
+
+            window.addEventListener('mousedown', start);
+            window.addEventListener('mousemove', move);
+            window.addEventListener('mouseup', end);
+            window.addEventListener('touchstart', start);
+            window.addEventListener('touchmove', move);
+            window.addEventListener('touchend', end);
+
+            // Chat Functionality
+            const chatToggle = document.getElementById('chat-toggle');
+            const chatWin = document.getElementById('chat-window');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            chatToggle.onclick = () => chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
+            
+            const sendMsg = () => {
+                const text = chatInput.value; if(!text) return;
+                document.getElementById('chat-messages').innerHTML += `<div class="user-msg">> ${text}</div>`;
+                chatInput.value = "";
+                setTimeout(() => botReply(text), 500);
+            };
+
+            sendBtn.onclick = sendMsg;
+            chatInput.onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
+        });
+    </script>
+</body>
+</html>
