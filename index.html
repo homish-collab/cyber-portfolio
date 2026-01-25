@@ -129,11 +129,34 @@
             .card-2 { transform: rotateY(120deg) translateZ(250px); }
             .card-3 { transform: rotateY(240deg) translateZ(250px); }
         }
+        #bg-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    z-index: 0;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    filter: brightness(0.3) contrast(1.2); /* Makes text pop */
+    pointer-events: none;
+}
+
+/* Ensure content stays above video */
+.highlight, #status-msg, #cta-btn, #projects-scene {
+    z-index: 5;
+    position: relative;
+}
     </style>
 </head>
 <body>
 
     <section class="hero">
+        <video autoplay muted loop playsinline id="bg-video">
+        <source src="https://cdn.pixabay.com/video/2021/04/12/70860-536411516_large.mp4" type="video/mp4">
+    </video>
         <h1 class="highlight">I AM A <span id="typewriter"></span></h1>
         <div id="status-msg"></div>
         <button id="cta-btn">Initialize System</button>
@@ -293,3 +316,4 @@
     </script>
 </body>
 </html>
+
