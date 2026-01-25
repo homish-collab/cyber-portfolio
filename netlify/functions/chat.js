@@ -1,33 +1,31 @@
-// api/chat.js
 const { OpenAI } = require("openai");
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // This is your secret key
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-export default async function handler(req, res) {
+exports.handler = async (event, context) => {
   // Only allow POST requests
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
   }
 
   try {
-    const { message } = req.body;
+    const { message } = JSON.parse(event.body);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
-        { 
-          role: "system", 
-          content: "You are the SYSTEM_CORE AI. You are professional, futuristic, and helpful. Keep answers concise." 
-        },
+        { role: "system", content: "You are a cyberpunk AI assistant for a developer portfolio." },
         { role: "user", content: message }
       ],
     });
 
-    return res.status(200).json({ reply: completion.choices[0].message.content });
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ reply: completion.choices[0].message.content }),
+    };
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }
-}
+};
