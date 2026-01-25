@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SYSTEM_CORE | V3.0 Final Build</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Monoton&family=Open+Sans:wght@400;700&display=swap');
 
@@ -41,7 +45,7 @@
             position: relative;
         }
 
-        .highlight { font-family: 'Bree Serif'; font-size: 3.5rem; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); z-index: 5; }
+        .highlight { font-family: 'Bree Serif'; font-size: 3.5rem; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); z-index: 5; text-align: center;}
         #status-msg { font-family: monospace; color: var(--neon-cyan); margin: 20px; z-index: 5; }
 
         /* --- 3D ROTATION --- */
@@ -85,23 +89,25 @@
             padding: 12px 20px; background: var(--bg-dark);
             border: 2px solid var(--neon-cyan); color: var(--neon-cyan);
             cursor: pointer; z-index: 1000; font-family: monospace;
+            box-shadow: 0 0 10px var(--neon-cyan);
         }
 
         #chat-window {
             position: fixed; bottom: 80px; right: 20px;
-            width: 300px; height: 350px;
+            width: 350px; height: 450px;
             background: var(--glass-bg); border: 1px solid var(--neon-magenta);
             display: none; flex-direction: column; z-index: 1000;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
         }
 
-        #chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; }
-        .bot-msg { color: var(--neon-cyan); margin-bottom: 8px; }
-        .user-msg { color: var(--neon-magenta); margin-bottom: 8px; text-align: right; }
+        #chat-messages { flex: 1; padding: 15px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; line-height: 1.4; }
+        .bot-msg { color: var(--neon-cyan); margin-bottom: 12px; border-left: 2px solid var(--neon-cyan); padding-left: 8px; }
+        .user-msg { color: var(--neon-magenta); margin-bottom: 12px; text-align: right; background: rgba(255, 0, 255, 0.05); padding: 5px; }
 
-        #chat-input-area { display: flex; border-top: 1px solid #333; }
-        #chat-input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; }
-        #send-btn { background: var(--neon-cyan); border: none; padding: 0 10px; cursor: pointer; }
+        #chat-input-area { display: flex; border-top: 1px solid #333; background: #000; }
+        #chat-input { flex: 1; background: transparent; border: none; color: white; padding: 15px; outline: none; }
+        #send-btn { background: var(--neon-cyan); border: none; padding: 0 15px; cursor: pointer; font-weight: bold; }
 
         #cta-btn {
             padding: 15px 40px; background: transparent;
@@ -112,13 +118,18 @@
 
         #cta-btn:hover { background: var(--neon-magenta); color: white; box-shadow: 0 0 30px var(--neon-magenta); }
 
+        /* Markdown Styling */
+        .bot-msg code { background: #1a1a1a; color: #ff0077; padding: 2px 4px; }
+        .bot-msg pre { background: #000; padding: 10px; margin: 5px 0; overflow-x: auto; border: 1px solid #333; }
+
         @media (max-width: 768px) {
+            .highlight { font-size: 2rem; }
+            #chat-window { width: 90%; right: 5%; }
             .card-1 { transform: rotateY(0deg) translateZ(250px); }
             .card-2 { transform: rotateY(120deg) translateZ(250px); }
             .card-3 { transform: rotateY(240deg) translateZ(250px); }
         }
     </style>
-    <script src="https://unpkg.com/compromise"></script>
 </head>
 <body>
 
@@ -146,19 +157,20 @@
     </section>
 
     <button id="chat-toggle">💬 SYS_COMMS</button>
-    <div id="chat-window" id="chatWindow">
-        <div style="background:var(--neon-magenta); padding:5px; font-size:0.7rem;">TERMINAL_CHAT v1.0</div>
+    <div id="chat-window">
+        <div style="background:var(--neon-magenta); padding:8px; font-size:0.75rem; font-weight:bold; color:black;">TERMINAL_CHAT v3.0 // ENCRYPTED</div>
         <div id="chat-messages">
-            <div class="bot-msg">SYS: Connection secure. How can I assist?</div>
+            <div class="bot-msg">SYS: Connection secure. Neural uplink established. How can I assist?</div>
         </div>
         <div id="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Try: skills, contact...">
+            <input type="text" id="chat-input" placeholder="Query system (e.g. skills, contact)...">
             <button id="send-btn">SEND</button>
         </div>
     </div>
 
     <script>
-  const phrases = ["DEVELOPER", "UI DESIGNER", "CYBER ARCHITECT"];
+        // 1. Typewriter Logic
+        const phrases = ["DEVELOPER", "UI DESIGNER", "CYBER ARCHITECT"];
         let pIdx = 0, cIdx = 0, isDeleting = false;
         function type() {
             const el = document.getElementById('typewriter');
@@ -169,52 +181,46 @@
             else setTimeout(type, isDeleting ? 50 : 150);
         }
 
-        // 2. CHAT BOT LOGIC
-        const botKnowledge = {
-            "skills": "I specialize in JavaScript, React, 3D CSS, and UI/UX architecture.",
-            "contact": "You can reach the core via encrypted mail at: dev@system-core.io",
-            "missions": "Check the 3D grid for my current active missions.",
-            "hi": "Greetings, traveler. Connection stable."
-        };
-
+        // 2. Realistic Bot Logic (Netlify Ready)
         async function botReply(text) {
-    const messages = document.getElementById('chat-messages');
-    
-    // 1. Create the Bot Message Container
-    const botDiv = document.createElement('div');
-    botDiv.className = "bot-msg";
-    botDiv.innerHTML = "SYS: CONNECTING_TO_CORE...";
-    messages.appendChild(botDiv);
-    messages.scrollTop = messages.scrollHeight;
+            const messages = document.getElementById('chat-messages');
+            const botDiv = document.createElement('div');
+            botDiv.className = "bot-msg";
+            botDiv.innerHTML = "SYS: ANALYZING...";
+            messages.appendChild(botDiv);
+            messages.scrollTop = messages.scrollHeight;
 
-    try {
-        // 2. Call your Serverless API (The one we'll host on Vercel/Netlify)
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text })
-        });
+            try {
+                // CHANGED: Correct Netlify Function path
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await response.json();
+                
+                // Parse markdown and highlight code
+                const rawReply = data.reply;
+                botDiv.innerHTML = "SYS: ";
+                
+                // ChatGPT style typewriter effect for the response
+                let i = 0;
+                const interval = setInterval(() => {
+                    // Use a temporary span to handle HTML parsing safely if needed
+                    botDiv.innerHTML = "SYS: " + marked.parse(rawReply.substring(0, i++));
+                    messages.scrollTop = messages.scrollHeight;
+                    if (i > rawReply.length) { 
+                        clearInterval(interval); 
+                        hljs.highlightAll(); // Final highlight pass
+                    }
+                }, 10);
 
-        const data = await response.json();
-        const aiResponse = data.reply; // This is the text from ChatGPT
-
-        // 3. Typewriter effect for the AI response
-        botDiv.innerHTML = "SYS: ";
-        let i = 0;
-        const interval = setInterval(() => {
-            botDiv.innerHTML += aiResponse.charAt(i++);
-            if (i >= aiResponse.length) {
-                clearInterval(interval);
-                messages.scrollTop = messages.scrollHeight;
+            } catch (err) {
+                botDiv.innerHTML = "SYS: ERROR_UPLINK_FAILED. Check API credits or Netlify logs.";
             }
-        }, 15);
+        }
 
-    } catch (err) {
-        botDiv.innerHTML = "SYS: ERROR_UPLINK_FAILED. LOCAL_MODE_ACTIVE.";
-    }
-}
-
-        // 3. INITIALIZATION
+        // 3. System Initialization
         document.addEventListener('DOMContentLoaded', () => {
             type();
             const hero = document.querySelector('.hero');
@@ -222,25 +228,30 @@
             const scene = document.getElementById('projects-scene');
             const carousel = document.getElementById('carousel');
 
-            // Mouse Glow
+            // Parallax mouse effect
             window.addEventListener('mousemove', (e) => {
                 hero.style.setProperty('--mouse-x', `${(e.clientX/window.innerWidth)*100}%`);
                 hero.style.setProperty('--mouse-y', `${(e.clientY/window.innerHeight)*100}%`);
             });
 
-            // Initialize Button
+            // 3D Scene Activation
             btn.onclick = () => {
                 btn.style.display = 'none';
                 document.getElementById('status-msg').innerText = "> Initializing 3D Orbital Grid...";
-                setTimeout(() => {
-                    document.getElementById('status-msg').style.display = 'none';
-                    scene.style.display = 'block';
-                }, 1500);
+                setTimeout(() => { 
+                    document.getElementById('status-msg').style.display = 'none'; 
+                    scene.style.display = 'block'; 
+                }, 1000);
             };
 
-            // 3D User Rotation
-            let isDragging = false, startX = 0, rotation = 0;
-            const start = (e) => { isDragging = true; startX = e.pageX || e.touches[0].pageX; };
+            // 3D Orbit Controls
+            let isDragging = false, startX = 0, rotation = 0, targetRot = 0;
+            const start = (e) => { 
+                if(scene.style.display === 'block') {
+                    isDragging = true; 
+                    startX = e.pageX || e.touches[0].pageX; 
+                }
+            };
             const move = (e) => {
                 if (!isDragging) return;
                 const x = e.pageX || e.touches[0].pageX;
@@ -250,26 +261,30 @@
             };
             const end = () => { isDragging = false; rotation = targetRot; };
 
-            window.addEventListener('mousedown', start);
-            window.addEventListener('mousemove', move);
+            window.addEventListener('mousedown', start); 
+            window.addEventListener('mousemove', move); 
             window.addEventListener('mouseup', end);
-            window.addEventListener('touchstart', start);
-            window.addEventListener('touchmove', move);
+            window.addEventListener('touchstart', start); 
+            window.addEventListener('touchmove', move); 
             window.addEventListener('touchend', end);
 
-            // Chat Functionality
+            // Chat UI Controls
             const chatToggle = document.getElementById('chat-toggle');
             const chatWin = document.getElementById('chat-window');
             const chatInput = document.getElementById('chat-input');
             const sendBtn = document.getElementById('send-btn');
 
-            chatToggle.onclick = () => chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
+            chatToggle.onclick = () => {
+                chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
+                if(chatWin.style.display === 'flex') chatInput.focus();
+            };
             
             const sendMsg = () => {
-                const text = chatInput.value; if(!text) return;
+                const text = chatInput.value.trim(); 
+                if(!text) return;
                 document.getElementById('chat-messages').innerHTML += `<div class="user-msg">> ${text}</div>`;
                 chatInput.value = "";
-                setTimeout(() => botReply(text), 500);
+                botReply(text);
             };
 
             sendBtn.onclick = sendMsg;
