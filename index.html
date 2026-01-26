@@ -3,197 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM_CORE | V3.0 Final Build</title>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <title>SYSTEM_CORE | NEURAL_V4.0</title>
     
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Monoton&family=Open+Sans:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Open+Sans:wght@400;700&display=swap');
 
         :root {
             --bg-dark: #0a0b10;
             --neon-cyan: #00f2ff;
             --neon-magenta: #ff00ff;
             --text-main: #e6edf3;
-            --glass-bg: rgba(22, 27, 34, 0.9);
+            --glass-bg: rgba(22, 27, 34, 0.8);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Open Sans', sans-serif; overflow: hidden; }
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Open Sans', sans-serif;
-            overflow-x: hidden;
-            border: 1px solid var(--neon-cyan);
+        /* --- BACKGROUND VIDEO --- */
+        #bg-video {
+            position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
+            transform: translate(-50%, -50%); z-index: -1; object-fit: cover;
+            filter: brightness(0.2) contrast(1.2);
         }
 
-        /* --- HERO & BACKGROUND --- */
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-                        rgba(0, 242, 255, 0.1) 0%, transparent 60%),
-                        linear-gradient(to bottom, rgba(10, 11, 16, 0.4), var(--bg-dark)),
-                        url('https://w.wallhaven.cc/full/1q/wallhaven-1q83qg.jpg');
-            background-size: cover;
-            background-position: center;
-            position: relative;
-        }
-
+        /* --- HERO SECTION --- */
+        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
         .highlight { font-family: 'Bree Serif'; font-size: 3.5rem; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); z-index: 5; text-align: center;}
-        #status-msg { font-family: monospace; color: var(--neon-cyan); margin: 20px; z-index: 5; }
-
-        /* --- 3D ROTATION --- */
-        #projects-scene {
-            display: none;
-            width: 100%;
-            height: 400px;
-            perspective: 1200px;
-            cursor: grab;
-            z-index: 5;
-        }
-
-        .carousel-3d {
-            width: 100%; height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
-        }
-
+        
+        /* --- 3D PROJECTS --- */
+        #projects-scene { display: none; width: 100%; height: 400px; perspective: 1200px; z-index: 5; margin-top: 50px; }
+        .carousel-3d { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .project-card {
-            position: absolute; left: 50%; top: 50%;
-            width: 300px; height: 200px;
-            margin-left: -150px; margin-top: -100px;
-            background: var(--glass-bg);
-            border: 2px solid var(--neon-cyan);
-            border-radius: 12px;
-            padding: 25px;
-            backface-visibility: hidden;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-            pointer-events: none;
+            position: absolute; left: 50%; top: 50%; width: 280px; height: 180px;
+            margin-left: -140px; margin-top: -90px; background: var(--glass-bg);
+            border: 2px solid var(--neon-cyan); border-radius: 12px; padding: 20px;
+            backface-visibility: hidden; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
         }
-
         .card-1 { transform: rotateY(0deg) translateZ(400px); }
         .card-2 { transform: rotateY(120deg) translateZ(400px); }
         .card-3 { transform: rotateY(240deg) translateZ(400px); }
 
-        /* --- CHAT BOT --- */
-        #chat-toggle {
-            position: fixed; bottom: 20px; right: 20px;
-            padding: 12px 20px; background: var(--bg-dark);
-            border: 2px solid var(--neon-cyan); color: var(--neon-cyan);
-            cursor: pointer; z-index: 1000; font-family: monospace;
-            box-shadow: 0 0 10px var(--neon-cyan);
+        /* --- AI VISION WINDOW --- */
+        #ai-vision-container {
+            position: fixed; top: 20px; left: 20px; width: 160px; height: 120px;
+            border: 2px solid var(--neon-cyan); z-index: 100; border-radius: 8px;
+            overflow: hidden; display: none; background: #000;
         }
+        #webcam { width: 100%; height: 100%; transform: scaleX(-1); }
+        #output_canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
+        /* --- BUTTONS --- */
+        .btn-main {
+            padding: 12px 30px; background: transparent; border: 2px solid var(--neon-magenta);
+            color: var(--neon-magenta); font-weight: bold; cursor: pointer; text-transform: uppercase;
+            transition: 0.3s; z-index: 10; margin: 10px;
+        }
+        .btn-main:hover { background: var(--neon-magenta); color: #fff; box-shadow: 0 0 20px var(--neon-magenta); }
+
+        /* --- CHAT WINDOW --- */
         #chat-window {
-            position: fixed; bottom: 80px; right: 20px;
-            width: 350px; height: 450px;
+            position: fixed; bottom: 80px; right: 20px; width: 320px; height: 400px;
             background: var(--glass-bg); border: 1px solid var(--neon-magenta);
-            display: none; flex-direction: column; z-index: 1000;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
+            display: none; flex-direction: column; z-index: 1000; backdrop-filter: blur(10px);
         }
+        #chat-messages { flex: 1; padding: 15px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; }
+        .bot-msg { color: var(--neon-cyan); margin-bottom: 10px; border-left: 2px solid var(--neon-cyan); padding-left: 8px; }
+        .user-msg { color: var(--neon-magenta); margin-bottom: 10px; text-align: right; }
+        #chat-input-area { display: flex; background: #000; padding: 5px; }
+        #chat-input { flex: 1; background: transparent; border: none; color: #fff; padding: 10px; outline: none; }
 
-        #chat-messages { flex: 1; padding: 15px; overflow-y: auto; font-family: monospace; font-size: 0.85rem; line-height: 1.4; }
-        .bot-msg { color: var(--neon-cyan); margin-bottom: 12px; border-left: 2px solid var(--neon-cyan); padding-left: 8px; }
-        .user-msg { color: var(--neon-magenta); margin-bottom: 12px; text-align: right; background: rgba(255, 0, 255, 0.05); padding: 5px; }
-
-        #chat-input-area { display: flex; border-top: 1px solid #333; background: #000; }
-        #chat-input { flex: 1; background: transparent; border: none; color: white; padding: 15px; outline: none; }
-        #send-btn { background: var(--neon-cyan); border: none; padding: 0 15px; cursor: pointer; font-weight: bold; }
-
-        #cta-btn {
-            padding: 15px 40px; background: transparent;
-            border: 2px solid var(--neon-magenta); color: var(--neon-magenta);
-            font-weight: bold; cursor: pointer; text-transform: uppercase;
-            transition: 0.3s; z-index: 10;
-        }
-
-        #cta-btn:hover { background: var(--neon-magenta); color: white; box-shadow: 0 0 30px var(--neon-magenta); }
-
-        /* Markdown Styling */
-        .bot-msg code { background: #1a1a1a; color: #ff0077; padding: 2px 4px; }
-        .bot-msg pre { background: #000; padding: 10px; margin: 5px 0; overflow-x: auto; border: 1px solid #333; }
-
-        @media (max-width: 768px) {
-            .highlight { font-size: 2rem; }
-            #chat-window { width: 90%; right: 5%; }
-            .card-1 { transform: rotateY(0deg) translateZ(250px); }
-            .card-2 { transform: rotateY(120deg) translateZ(250px); }
-            .card-3 { transform: rotateY(240deg) translateZ(250px); }
-        }
-        #bg-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    z-index: 0;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
-    filter: brightness(0.3) contrast(1.2); /* Makes text pop */
-    pointer-events: none;
-}
-
-/* Ensure content stays above video */
-.highlight, #status-msg, #cta-btn, #projects-scene {
-    z-index: 5;
-    position: relative;
-}
+        #chat-toggle { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); cursor: pointer; z-index: 1001; }
     </style>
 </head>
 <body>
 
-    <section class="hero">
-        <video autoplay muted loop playsinline id="bg-video">
+    <video autoplay muted loop playsinline id="bg-video">
         <source src="https://cdn.pixabay.com/video/2021/04/12/70860-536411516_large.mp4" type="video/mp4">
     </video>
+
+    <div id="ai-vision-container">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="output_canvas"></canvas>
+    </div>
+
+    <section class="hero">
         <h1 class="highlight">I AM A <span id="typewriter"></span></h1>
-        <div id="status-msg"></div>
-        <button id="cta-btn">Initialize System</button>
+        <div style="display:flex;">
+            <button class="btn-main" id="init-btn">Initialize System</button>
+            <button class="btn-main" id="ml-btn">Enable AI Vision</button>
+        </div>
 
         <div id="projects-scene">
             <div class="carousel-3d" id="carousel">
-                <div class="project-card card-1">
-                    <h3>NEURAL_SYNC</h3>
-                    <p>Real-time biometric data streaming dashboard.</p>
-                </div>
-                <div class="project-card card-2">
-                    <h3>CYBER_MARKET</h3>
-                    <p>Encrypted P2P trading node interface.</p>
-                </div>
-                <div class="project-card card-3">
-                    <h3>DATA_GHOST</h3>
-                    <p>Stealth protocol for digital asset protection.</p>
-                </div>
+                <div class="project-card card-1"><h3>NEURAL_SYNC</h3><p>ML-driven data stream.</p></div>
+                <div class="project-card card-2"><h3>CYBER_MARKET</h3><p>P2P Encrypted Node.</p></div>
+                <div class="project-card card-3"><h3>DATA_GHOST</h3><p>Stealth Security Protocol.</p></div>
             </div>
         </div>
     </section>
 
     <button id="chat-toggle">💬 SYS_COMMS</button>
     <div id="chat-window">
-        <div style="background:var(--neon-magenta); padding:8px; font-size:0.75rem; font-weight:bold; color:black;">TERMINAL_CHAT v3.0 // ENCRYPTED</div>
-        <div id="chat-messages">
-            <div class="bot-msg">SYS: Connection secure. Neural uplink established. How can I assist?</div>
-        </div>
+        <div style="background:var(--neon-magenta); padding:5px; font-size:0.7rem; color:#000; font-weight:bold;">TERMINAL_V4.0 // ENCRYPTED</div>
+        <div id="chat-messages"><div class="bot-msg">SYS: Connection ready.</div></div>
         <div id="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Query system (e.g. skills, contact)...">
-            <button id="send-btn">SEND</button>
+            <input type="text" id="chat-input" placeholder="Query uplink...">
+            <button id="send-btn" style="background:var(--neon-cyan); border:none; padding:10px;">SEND</button>
         </div>
     </div>
 
     <script>
-        // 1. Typewriter Logic
-        const phrases = ["DEVELOPER", "UI DESIGNER", "CYBER ARCHITECT"];
+        // --- 1. TYPEWRITER ---
+        const phrases = ["DEVELOPER", "AI ARCHITECT", "UI DESIGNER"];
         let pIdx = 0, cIdx = 0, isDeleting = false;
         function type() {
             const el = document.getElementById('typewriter');
@@ -204,116 +133,70 @@
             else setTimeout(type, isDeleting ? 50 : 150);
         }
 
-        // 2. Realistic Bot Logic (Netlify Ready)
-        async function botReply(text) {
-            const messages = document.getElementById('chat-messages');
-            const botDiv = document.createElement('div');
-            botDiv.className = "bot-msg";
-            botDiv.innerHTML = "SYS: ANALYZING...";
-            messages.appendChild(botDiv);
-            messages.scrollTop = messages.scrollHeight;
+        // --- 2. AI GESTURE CONTROL (MediaPipe) ---
+        const videoElement = document.getElementById('webcam');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+        
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5 });
+        hands.onResults((results) => {
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const x = results.multiHandLandmarks[0][8].x; // Index finger tip
+                const rotation = (x - 0.5) * -360; 
+                document.getElementById('carousel').style.transform = `rotateY(${rotation}deg)`;
+                drawConnectors(canvasCtx, results.multiHandLandmarks[0], HAND_CONNECTIONS, {color: '#00f2ff', lineWidth: 2});
+            }
+        });
 
+        const camera = new Camera(videoElement, {
+            onFrame: async () => { await hands.send({image: videoElement}); },
+            width: 160, height: 120
+        });
+
+        // --- 3. CHAT LOGIC ---
+        async function botReply(text) {
+            const msgBox = document.getElementById('chat-messages');
+            const botDiv = document.createElement('div');
+            botDiv.className = "bot-msg"; botDiv.innerText = "SYS: ANALYZING...";
+            msgBox.appendChild(botDiv);
             try {
-                // CHANGED: Correct Netlify Function path
                 const response = await fetch('/.netlify/functions/chat', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: text })
                 });
                 const data = await response.json();
-                
-                // Parse markdown and highlight code
-                const rawReply = data.reply;
-                botDiv.innerHTML = "SYS: ";
-                
-                // ChatGPT style typewriter effect for the response
-                let i = 0;
-                const interval = setInterval(() => {
-                    // Use a temporary span to handle HTML parsing safely if needed
-                    botDiv.innerHTML = "SYS: " + marked.parse(rawReply.substring(0, i++));
-                    messages.scrollTop = messages.scrollHeight;
-                    if (i > rawReply.length) { 
-                        clearInterval(interval); 
-                        hljs.highlightAll(); // Final highlight pass
-                    }
-                }, 10);
-
-            } catch (err) {
-                botDiv.innerHTML = "SYS: ERROR_UPLINK_FAILED. Check API credits or Netlify logs.";
-            }
+                botDiv.innerHTML = "SYS: " + marked.parse(data.reply);
+                hljs.highlightAll();
+            } catch { botDiv.innerText = "SYS: ERROR_UPLINK."; }
+            msgBox.scrollTop = msgBox.scrollHeight;
         }
 
-        // 3. System Initialization
+        // --- 4. INIT LISTENERS ---
         document.addEventListener('DOMContentLoaded', () => {
             type();
-            const hero = document.querySelector('.hero');
-            const btn = document.getElementById('cta-btn');
-            const scene = document.getElementById('projects-scene');
-            const carousel = document.getElementById('carousel');
-
-            // Parallax mouse effect
-            window.addEventListener('mousemove', (e) => {
-                hero.style.setProperty('--mouse-x', `${(e.clientX/window.innerWidth)*100}%`);
-                hero.style.setProperty('--mouse-y', `${(e.clientY/window.innerHeight)*100}%`);
-            });
-
-            // 3D Scene Activation
-            btn.onclick = () => {
-                btn.style.display = 'none';
-                document.getElementById('status-msg').innerText = "> Initializing 3D Orbital Grid...";
-                setTimeout(() => { 
-                    document.getElementById('status-msg').style.display = 'none'; 
-                    scene.style.display = 'block'; 
-                }, 1000);
+            document.getElementById('init-btn').onclick = () => {
+                document.getElementById('projects-scene').style.display = 'block';
+                document.getElementById('init-btn').style.display = 'none';
             };
-
-            // 3D Orbit Controls
-            let isDragging = false, startX = 0, rotation = 0, targetRot = 0;
-            const start = (e) => { 
-                if(scene.style.display === 'block') {
-                    isDragging = true; 
-                    startX = e.pageX || e.touches[0].pageX; 
-                }
+            document.getElementById('ml-btn').onclick = () => {
+                document.getElementById('ai-vision-container').style.display = 'block';
+                camera.start();
+                document.getElementById('ml-btn').innerText = "AI_VISION: ONLINE";
             };
-            const move = (e) => {
-                if (!isDragging) return;
-                const x = e.pageX || e.touches[0].pageX;
-                const walk = (x - startX) * 0.4;
-                carousel.style.transform = `rotateY(${rotation + walk}deg)`;
-                targetRot = rotation + walk;
+            document.getElementById('chat-toggle').onclick = () => {
+                const win = document.getElementById('chat-window');
+                win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
             };
-            const end = () => { isDragging = false; rotation = targetRot; };
-
-            window.addEventListener('mousedown', start); 
-            window.addEventListener('mousemove', move); 
-            window.addEventListener('mouseup', end);
-            window.addEventListener('touchstart', start); 
-            window.addEventListener('touchmove', move); 
-            window.addEventListener('touchend', end);
-
-            // Chat UI Controls
-            const chatToggle = document.getElementById('chat-toggle');
-            const chatWin = document.getElementById('chat-window');
-            const chatInput = document.getElementById('chat-input');
-            const sendBtn = document.getElementById('send-btn');
-
-            chatToggle.onclick = () => {
-                chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
-                if(chatWin.style.display === 'flex') chatInput.focus();
+            document.getElementById('send-btn').onclick = () => {
+                const input = document.getElementById('chat-input');
+                if(!input.value) return;
+                document.getElementById('chat-messages').innerHTML += `<div class="user-msg">> ${input.value}</div>`;
+                botReply(input.value);
+                input.value = "";
             };
-            
-            const sendMsg = () => {
-                const text = chatInput.value.trim(); 
-                if(!text) return;
-                document.getElementById('chat-messages').innerHTML += `<div class="user-msg">> ${text}</div>`;
-                chatInput.value = "";
-                botReply(text);
-            };
-
-            sendBtn.onclick = sendMsg;
-            chatInput.onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
         });
     </script>
 </body>
 </html>
-
