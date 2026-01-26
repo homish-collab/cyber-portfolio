@@ -3,126 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM_CORE | NEURAL_V4.0</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css">
-    
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
-
+    <title>SYSTEM_CORE | V3.0 Final Build</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Open+Sans:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Monoton&family=Open+Sans:wght@400;700&display=swap');
 
         :root {
             --bg-dark: #0a0b10;
             --neon-cyan: #00f2ff;
             --neon-magenta: #ff00ff;
             --text-main: #e6edf3;
-            --glass-bg: rgba(22, 27, 34, 0.8);
+            --glass-bg: rgba(22, 27, 34, 0.9);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Open Sans', sans-serif; overflow: hidden; }
 
-        /* --- BACKGROUND VIDEO --- */
-        #bg-video {
-            position: fixed; top: 50%; left: 50%; min-width: 100%; min-height: 100%;
-            transform: translate(-50%, -50%); z-index: -1; object-fit: cover;
-            filter: brightness(0.2) contrast(1.2);
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Open Sans', sans-serif;
+            overflow-x: hidden;
+            border: 1px solid var(--neon-cyan);
         }
 
-        /* --- HERO SECTION --- */
-        .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
-        .highlight { font-family: 'Bree Serif'; font-size: 3.5rem; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); z-index: 5; text-align: center;}
-        
-        /* --- 3D PROJECTS --- */
-        #projects-scene { display: none; width: 100%; height: 400px; perspective: 1200px; z-index: 5; margin-top: 50px; }
-        .carousel-3d { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        /* --- HERO & BACKGROUND --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                        rgba(0, 242, 255, 0.1) 0%, transparent 60%),
+                        linear-gradient(to bottom, rgba(10, 11, 16, 0.4), var(--bg-dark)),
+                        url('https://w.wallhaven.cc/full/1q/wallhaven-1q83qg.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .highlight { font-family: 'Bree Serif'; font-size: 3.5rem; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); z-index: 5; }
+        #status-msg { font-family: monospace; color: var(--neon-cyan); margin: 20px; z-index: 5; }
+
+        /* --- 3D ROTATION --- */
+        #projects-scene {
+            display: none;
+            width: 100%;
+            height: 400px;
+            perspective: 1200px;
+            cursor: grab;
+            z-index: 5;
+        }
+
+        .carousel-3d {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s ease-out;
+        }
+
         .project-card {
-            position: absolute; left: 50%; top: 50%; width: 280px; height: 180px;
-            margin-left: -140px; margin-top: -90px; background: var(--glass-bg);
-            border: 2px solid var(--neon-cyan); border-radius: 12px; padding: 20px;
-            backface-visibility: hidden; backdrop-filter: blur(10px); box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            position: absolute; left: 50%; top: 50%;
+            width: 300px; height: 200px;
+            margin-left: -150px; margin-top: -100px;
+            background: var(--glass-bg);
+            border: 2px solid var(--neon-cyan);
+            border-radius: 12px;
+            padding: 25px;
+            backface-visibility: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
+            pointer-events: none;
         }
+
         .card-1 { transform: rotateY(0deg) translateZ(400px); }
         .card-2 { transform: rotateY(120deg) translateZ(400px); }
         .card-3 { transform: rotateY(240deg) translateZ(400px); }
 
-        /* --- AI VISION WINDOW --- */
-        #ai-vision-container {
-            position: fixed; top: 20px; left: 20px; width: 160px; height: 120px;
-            border: 2px solid var(--neon-cyan); z-index: 100; border-radius: 8px;
-            overflow: hidden; display: none; background: #000;
+        /* --- CHAT BOT --- */
+        #chat-toggle {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 12px 20px; background: var(--bg-dark);
+            border: 2px solid var(--neon-cyan); color: var(--neon-cyan);
+            cursor: pointer; z-index: 1000; font-family: monospace;
         }
-        #webcam { width: 100%; height: 100%; transform: scaleX(-1); }
-        #output_canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        /* --- BUTTONS --- */
-        .btn-main {
-            padding: 12px 30px; background: transparent; border: 2px solid var(--neon-magenta);
-            color: var(--neon-magenta); font-weight: bold; cursor: pointer; text-transform: uppercase;
-            transition: 0.3s; z-index: 10; margin: 10px;
-        }
-        .btn-main:hover { background: var(--neon-magenta); color: #fff; box-shadow: 0 0 20px var(--neon-magenta); }
-
-        /* --- CHAT WINDOW --- */
         #chat-window {
-            position: fixed; bottom: 80px; right: 20px; width: 320px; height: 400px;
+            position: fixed; bottom: 80px; right: 20px;
+            width: 300px; height: 350px;
             background: var(--glass-bg); border: 1px solid var(--neon-magenta);
-            display: none; flex-direction: column; z-index: 1000; backdrop-filter: blur(10px);
+            display: none; flex-direction: column; z-index: 1000;
+            backdrop-filter: blur(10px);
         }
-        #chat-messages { flex: 1; padding: 15px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; }
-        .bot-msg { color: var(--neon-cyan); margin-bottom: 10px; border-left: 2px solid var(--neon-cyan); padding-left: 8px; }
-        .user-msg { color: var(--neon-magenta); margin-bottom: 10px; text-align: right; }
-        #chat-input-area { display: flex; background: #000; padding: 5px; }
-        #chat-input { flex: 1; background: transparent; border: none; color: #fff; padding: 10px; outline: none; }
 
-        #chat-toggle { position: fixed; bottom: 20px; right: 20px; padding: 10px 20px; background: #000; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); cursor: pointer; z-index: 1001; }
+        #chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; }
+        .bot-msg { color: var(--neon-cyan); margin-bottom: 8px; }
+        .user-msg { color: var(--neon-magenta); margin-bottom: 8px; text-align: right; }
+
+        #chat-input-area { display: flex; border-top: 1px solid #333; }
+        #chat-input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; }
+        #send-btn { background: var(--neon-cyan); border: none; padding: 0 10px; cursor: pointer; }
+
+        #cta-btn {
+            padding: 15px 40px; background: transparent;
+            border: 2px solid var(--neon-magenta); color: var(--neon-magenta);
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
+            transition: 0.3s; z-index: 10;
+        }
+
+        #cta-btn:hover { background: var(--neon-magenta); color: white; box-shadow: 0 0 30px var(--neon-magenta); }
+
+        @media (max-width: 768px) {
+            .card-1 { transform: rotateY(0deg) translateZ(250px); }
+            .card-2 { transform: rotateY(120deg) translateZ(250px); }
+            .card-3 { transform: rotateY(240deg) translateZ(250px); }
+        }
     </style>
+    <script src="https://unpkg.com/compromise"></script>
 </head>
 <body>
 
-    <video autoplay muted loop playsinline id="bg-video">
-        <source src="https://cdn.pixabay.com/video/2021/04/12/70860-536411516_large.mp4" type="video/mp4">
-    </video>
-
-    <div id="ai-vision-container">
-        <video id="webcam" autoplay playsinline></video>
-        <canvas id="output_canvas"></canvas>
-    </div>
-
     <section class="hero">
         <h1 class="highlight">I AM A <span id="typewriter"></span></h1>
-        <div style="display:flex;">
-            <button class="btn-main" id="init-btn">Initialize System</button>
-            <button class="btn-main" id="ml-btn">Enable AI Vision</button>
-        </div>
+        <div id="status-msg"></div>
+        <button id="cta-btn">Initialize System</button>
 
         <div id="projects-scene">
             <div class="carousel-3d" id="carousel">
-                <div class="project-card card-1"><h3>NEURAL_SYNC</h3><p>ML-driven data stream.</p></div>
-                <div class="project-card card-2"><h3>CYBER_MARKET</h3><p>P2P Encrypted Node.</p></div>
-                <div class="project-card card-3"><h3>DATA_GHOST</h3><p>Stealth Security Protocol.</p></div>
+                <div class="project-card card-1">
+                    <h3>NEURAL_SYNC</h3>
+                    <p>Real-time biometric data streaming dashboard.</p>
+                </div>
+                <div class="project-card card-2">
+                    <h3>CYBER_MARKET</h3>
+                    <p>Encrypted P2P trading node interface.</p>
+                </div>
+                <div class="project-card card-3">
+                    <h3>DATA_GHOST</h3>
+                    <p>Stealth protocol for digital asset protection.</p>
+                </div>
             </div>
         </div>
     </section>
 
     <button id="chat-toggle">💬 SYS_COMMS</button>
-    <div id="chat-window">
-        <div style="background:var(--neon-magenta); padding:5px; font-size:0.7rem; color:#000; font-weight:bold;">TERMINAL_V4.0 // ENCRYPTED</div>
-        <div id="chat-messages"><div class="bot-msg">SYS: Connection ready.</div></div>
+    <div id="chat-window" id="chatWindow">
+        <div style="background:var(--neon-magenta); padding:5px; font-size:0.7rem;">TERMINAL_CHAT v1.0</div>
+        <div id="chat-messages">
+            <div class="bot-msg">SYS: Connection secure. How can I assist?</div>
+        </div>
         <div id="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Query uplink...">
-            <button id="send-btn" style="background:var(--neon-cyan); border:none; padding:10px;">SEND</button>
+            <input type="text" id="chat-input" placeholder="Try: skills, contact...">
+            <button id="send-btn">SEND</button>
         </div>
     </div>
 
     <script>
-        // --- 1. TYPEWRITER ---
-        const phrases = ["HOMISH"];
+  // 1. Typewriter
+        const phrases = ["DEVELOPER", "UI DESIGNER", "CYBER ARCHITECT"];
         let pIdx = 0, cIdx = 0, isDeleting = false;
         function type() {
             const el = document.getElementById('typewriter');
@@ -133,71 +170,85 @@
             else setTimeout(type, isDeleting ? 50 : 150);
         }
 
-        // --- 2. AI GESTURE CONTROL (MediaPipe) ---
-        const videoElement = document.getElementById('webcam');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5 });
-        hands.onResults((results) => {
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const x = results.multiHandLandmarks[0][8].x; // Index finger tip
-                const rotation = (x - 0.5) * -360; 
-                document.getElementById('carousel').style.transform = `rotateY(${rotation}deg)`;
-                drawConnectors(canvasCtx, results.multiHandLandmarks[0], HAND_CONNECTIONS, {color: '#00f2ff', lineWidth: 2});
-            }
-        });
-
-        const camera = new Camera(videoElement, {
-            onFrame: async () => { await hands.send({image: videoElement}); },
-            width: 160, height: 120
-        });
-
-        // --- 3. CHAT LOGIC ---
+        // 2. Real AI Bot Logic
         async function botReply(text) {
-            const msgBox = document.getElementById('chat-messages');
+            const messages = document.getElementById('chat-messages');
             const botDiv = document.createElement('div');
-            botDiv.className = "bot-msg"; botDiv.innerText = "SYS: ANALYZING...";
-            msgBox.appendChild(botDiv);
+            botDiv.className = "bot-msg";
+            botDiv.innerHTML = "SYS: ANALYZING...";
+            messages.appendChild(botDiv);
+            messages.scrollTop = messages.scrollHeight;
+
             try {
-                const response = await fetch('/.netlify/functions/chat', {
+                const response = await fetch('/api/chat', {
                     method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: text })
                 });
                 const data = await response.json();
-                botDiv.innerHTML = "SYS: " + marked.parse(data.reply);
-                hljs.highlightAll();
-            } catch { botDiv.innerText = "SYS: ERROR_UPLINK."; }
-            msgBox.scrollTop = msgBox.scrollHeight;
+                const aiResponse = data.reply;
+
+                botDiv.innerHTML = "SYS: ";
+                let i = 0;
+                const interval = setInterval(() => {
+                    botDiv.innerHTML += aiResponse.charAt(i++);
+                    if (i >= aiResponse.length) { clearInterval(interval); messages.scrollTop = messages.scrollHeight; }
+                }, 15);
+            } catch (err) {
+                botDiv.innerHTML = "SYS: ERROR_UPLINK_FAILED.";
+            }
         }
 
-        // --- 4. INIT LISTENERS ---
+        // 3. Initialization & Listeners
         document.addEventListener('DOMContentLoaded', () => {
             type();
-            document.getElementById('init-btn').onclick = () => {
-                document.getElementById('projects-scene').style.display = 'block';
-                document.getElementById('init-btn').style.display = 'none';
+            const hero = document.querySelector('.hero');
+            const btn = document.getElementById('cta-btn');
+            const scene = document.getElementById('projects-scene');
+            const carousel = document.getElementById('carousel');
+
+            window.addEventListener('mousemove', (e) => {
+                hero.style.setProperty('--mouse-x', `${(e.clientX/window.innerWidth)*100}%`);
+                hero.style.setProperty('--mouse-y', `${(e.clientY/window.innerHeight)*100}%`);
+            });
+
+            btn.onclick = () => {
+                btn.style.display = 'none';
+                document.getElementById('status-msg').innerText = "> Initializing 3D Orbital Grid...";
+                setTimeout(() => { document.getElementById('status-msg').style.display = 'none'; scene.style.display = 'block'; }, 1500);
             };
-            document.getElementById('ml-btn').onclick = () => {
-                document.getElementById('ai-vision-container').style.display = 'block';
-                camera.start();
-                document.getElementById('ml-btn').innerText = "AI_VISION: ONLINE";
+
+            // 3D Rotation
+            let isDragging = false, startX = 0, rotation = 0, targetRot = 0;
+            const start = (e) => { isDragging = true; startX = e.pageX || e.touches[0].pageX; };
+            const move = (e) => {
+                if (!isDragging) return;
+                const x = e.pageX || e.touches[0].pageX;
+                const walk = (x - startX) * 0.4;
+                carousel.style.transform = `rotateY(${rotation + walk}deg)`;
+                targetRot = rotation + walk;
             };
-            document.getElementById('chat-toggle').onclick = () => {
-                const win = document.getElementById('chat-window');
-                win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+            const end = () => { isDragging = false; rotation = targetRot; };
+
+            window.addEventListener('mousedown', start); window.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
+
+            // Chat UI
+            const chatToggle = document.getElementById('chat-toggle');
+            const chatWin = document.getElementById('chat-window');
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+
+            chatToggle.onclick = () => chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
+            
+            const sendMsg = () => {
+                const text = chatInput.value; if(!text) return;
+                document.getElementById('chat-messages').innerHTML += `<div class="user-msg">> ${text}</div>`;
+                chatInput.value = "";
+                botReply(text);
             };
-            document.getElementById('send-btn').onclick = () => {
-                const input = document.getElementById('chat-input');
-                if(!input.value) return;
-                document.getElementById('chat-messages').innerHTML += `<div class="user-msg">> ${input.value}</div>`;
-                botReply(input.value);
-                input.value = "";
-            };
+            sendBtn.onclick = sendMsg;
+            chatInput.onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
         });
     </script>
 </body>
 </html>
-
