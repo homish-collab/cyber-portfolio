@@ -1,254 +1,643 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM_CORE | V3.0 Final Build</title>
+    <title>Kamal Counselling - JEE & NEET Expert Admissions Guide</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for LinkedIn, Gmail, and Social Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Bree+Serif&family=Monoton&family=Open+Sans:wght@400;700&display=swap');
-
         :root {
-            --bg-dark: #0a0b10;
-            --neon-cyan: #00f2ff;
-            --neon-magenta: #ff00ff;
-            --text-main: #e6edf3;
-            --glass-bg: rgba(22, 27, 34, 0.9);
+            --primary: #004a99;
+            --accent: #ffc107;
+            --success: #28a745;
+            --gmail-color: #ea4335;
+            --linkedin-color: #0077b5;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-family: 'Open Sans', sans-serif;
+            font-family: 'Inter', sans-serif;
+            color: #333;
             overflow-x: hidden;
-            border: 1px solid var(--neon-cyan);
         }
 
-        /* --- HERO & BACKGROUND --- */
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-                        rgba(0, 242, 255, 0.1) 0%, transparent 60%),
-                        linear-gradient(to bottom, rgba(10, 11, 16, 0.4), var(--bg-dark)),
-                        url('https://w.wallhaven.cc/full/1q/wallhaven-1q83qg.jpg');
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-img {
+            height: 45px;
+            border-radius: 5px;
+        }
+
+        .hero-section {
+            background: linear-gradient(rgba(0, 0, 0, 0.85), rgba(20, 20, 20, 0.95)),
+                url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80');
+            height: 65vh;
             background-size: cover;
             background-position: center;
-            position: relative;
+            color: white;
         }
 
-        .highlight { font-family: 'Bree Serif'; font-size: 3.5rem; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan); z-index: 5; }
-        #status-msg { font-family: monospace; color: var(--neon-cyan); margin: 20px; z-index: 5; }
-
-        /* --- 3D ROTATION --- */
-        #projects-scene {
-            display: none;
-            width: 100%;
-            height: 400px;
-            perspective: 1200px;
-            cursor: grab;
-            z-index: 5;
+        .hero-heading {
+            font-size: 45px;
+            font-weight: 800;
+            min-height: 1.2em;
         }
 
-        .carousel-3d {
-            width: 100%; height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.1s ease-out;
+        .cursor {
+            color: transparent;
+            animation: blink 1s infinite;
         }
 
-        .project-card {
-            position: absolute; left: 50%; top: 50%;
-            width: 300px; height: 200px;
-            margin-left: -150px; margin-top: -100px;
-            background: var(--glass-bg);
-            border: 2px solid var(--neon-cyan);
-            border-radius: 12px;
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .testimonial-card {
+            background: #fff;
             padding: 25px;
-            backface-visibility: hidden;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.2);
-            pointer-events: none;
+            border-radius: 12px;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            height: 100%;
         }
 
-        .card-1 { transform: rotateY(0deg) translateZ(400px); }
-        .card-2 { transform: rotateY(120deg) translateZ(400px); }
-        .card-3 { transform: rotateY(240deg) translateZ(400px); }
-
-        /* --- CHAT BOT --- */
-        #chat-toggle {
-            position: fixed; bottom: 20px; right: 20px;
-            padding: 12px 20px; background: var(--bg-dark);
-            border: 2px solid var(--neon-cyan); color: var(--neon-cyan);
-            cursor: pointer; z-index: 1000; font-family: monospace;
+        .resource-card {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        #chat-window {
-            position: fixed; bottom: 80px; right: 20px;
-            width: 300px; height: 350px;
-            background: var(--glass-bg); border: 1px solid var(--neon-magenta);
-            display: none; flex-direction: column; z-index: 1000;
-            backdrop-filter: blur(10px);
+        .resource-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+            border-color: var(--primary);
         }
 
-        #chat-messages { flex: 1; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 0.8rem; }
-        .bot-msg { color: var(--neon-cyan); margin-bottom: 8px; }
-        .user-msg { color: var(--neon-magenta); margin-bottom: 8px; text-align: right; }
-
-        #chat-input-area { display: flex; border-top: 1px solid #333; }
-        #chat-input { flex: 1; background: transparent; border: none; color: white; padding: 10px; outline: none; }
-        #send-btn { background: var(--neon-cyan); border: none; padding: 0 10px; cursor: pointer; }
-
-        #cta-btn {
-            padding: 15px 40px; background: transparent;
-            border: 2px solid var(--neon-magenta); color: var(--neon-magenta);
-            font-weight: bold; cursor: pointer; text-transform: uppercase;
-            transition: 0.3s; z-index: 10;
+        .icon-box {
+            font-size: 2.5rem;
+            line-height: 1;
         }
 
-        #cta-btn:hover { background: var(--neon-magenta); color: white; box-shadow: 0 0 30px var(--neon-magenta); }
+        .cta-banner {
+            background: linear-gradient(135deg, #004a99 0%, #002d5c 100%);
+            box-shadow: 0 10px 20px rgba(0, 74, 153, 0.2);
+        }
 
-        @media (max-width: 768px) {
-            .card-1 { transform: rotateY(0deg) translateZ(250px); }
-            .card-2 { transform: rotateY(120deg) translateZ(250px); }
-            .card-3 { transform: rotateY(240deg) translateZ(250px); }
+        .btn-warning {
+            background-color: var(--accent);
+            border: none;
+            color: #000;
+            font-weight: 700;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: scale(1.03);
+            transition: all 0.2s ease;
+        }
+
+        .testimonial-img {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            flex-shrink: 0;
+            border: 2px solid #eee;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 25px;
+        }
+
+        .stat-number {
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 2.8rem;
+            line-height: 1.1;
+        }
+
+        .exam-badge {
+            font-size: 0.85rem;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .badge-jee {
+            background-color: #e1f5fe;
+            color: #0288d1;
+        }
+
+        .badge-neet {
+            background-color: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .team-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #6c757d;
+            object-fit: cover;
+        }
+
+        /* Core Contact Button Icon Adjustments */
+        .gmail-icon-custom {
+            color: var(--gmail-color);
+            transition: transform 0.2s ease;
+        }
+
+        .linkedin-icon-custom {
+            color: var(--linkedin-color);
+            transition: transform 0.2s ease;
+        }
+
+        .contact-btn:hover .gmail-icon-custom,
+        .contact-btn:hover .linkedin-icon-custom {
+            transform: scale(1.15);
+        }
+
+        /* Footer Icons */
+        .footer-social-btn {
+            font-size: 2rem;
+            margin: 0 12px;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-social-btn.linkedin-btn {
+            color: var(--linkedin-color);
+        }
+
+        .footer-social-btn.gmail-btn {
+            color: var(--gmail-color);
+        }
+
+        .footer-social-btn:hover {
+            transform: translateY(-5px) scale(1.15);
+            filter: brightness(1.2);
         }
     </style>
-    <script src="https://unpkg.com/compromise"></script>
 </head>
+
 <body>
-
-    <section class="hero">
-        <h1 class="highlight">I AM A <span id="typewriter"></span></h1>
-        <div id="status-msg"></div>
-        <button id="cta-btn">Initialize System</button>
-
-        <div id="projects-scene">
-            <div class="carousel-3d" id="carousel">
-                <div class="project-card card-1">
-                    <h3>NEURAL_SYNC</h3>
-                    <p>Real-time biometric data streaming dashboard.</p>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="https://cdn.phototourl.com/free/2026-07-16-e4e4e01c-3103-4fab-a9fb-3f4cfd39ec5e.png" class="logo-img mr-2" alt="Logo">
+                <span class="font-weight-bold">KAMAL COUNSELLING</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ml-auto">
+                    <a class="nav-link" href="#why-choose-us">Why Choose Us</a>
+                    <a class="nav-link" href="#refund">Refund Policy</a>
+                    <a class="nav-link" href="#govt-act">Govt Act</a>
+                    <a class="nav-link" href="#toolkit">Admission Toolkit</a>
+                    <a class="nav-link" href="#pricing">Packages</a>
+                    <a class="nav-link" href="#success-stories">Success Stories</a>
+                    <a class="nav-link btn btn-warning text-dark font-weight-bold ml-lg-3 px-3" href="#registration">Register Now</a>
                 </div>
-                <div class="project-card card-2">
-                    <h3>CYBER_MARKET</h3>
-                    <p>Encrypted P2P trading node interface.</p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Header -->
+    <header class="hero-section d-flex flex-column justify-content-center text-center">
+        <div class="container">
+            <h1 class="hero-heading" id="typewriter"></h1>
+            <p class="lead text-light">100% Genuine Guidance for JoSAA, CSAB, MCC, and Premier State Panels</p>
+            <div class="mt-4">
+                <span class="badge badge-light p-2 px-3 mx-2 font-weight-bold text-primary">✓ Top-Level Expert Support</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Performance Metrics / Stats Section -->
+    <section class="py-4 bg-white border-bottom">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="stat-box resource-card">
+                        <div class="stat-number mb-1">500+</div>
+                        <p class="text-uppercase tracking-wider text-muted font-weight-bold small mb-0">Students Helped</p>
+                    </div>
                 </div>
-                <div class="project-card card-3">
-                    <h3>DATA_GHOST</h3>
-                    <p>Stealth protocol for digital asset protection.</p>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <div class="stat-box resource-card">
+                        <div class="stat-number mb-1">JOSAA CSAB MCC </div>
+                        <p class="text-uppercase tracking-wider text-muted font-weight-bold small mb-0">TOP COUNSELLING support </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-box resource-card">
+                        <div class="stat-number mb-1">100%</div>
+                        <p class="text-uppercase tracking-wider text-muted font-weight-bold small mb-0">guranteed choice filling </p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <button id="chat-toggle">💬 SYS_COMMS</button>
-    <div id="chat-window" id="chatWindow">
-        <div style="background:var(--neon-magenta); padding:5px; font-size:0.7rem;">TERMINAL_CHAT v1.0</div>
-        <div id="chat-messages">
-            <div class="bot-msg">SYS: Connection secure. How can I assist?</div>
-        </div>
-        <div id="chat-input-area">
-            <input type="text" id="chat-input" placeholder="Try: skills, contact...">
-            <button id="send-btn">SEND</button>
+    <!-- Why Choose Us / What We Offer -->
+    <div id="why-choose-us" class="container py-5">
+        <h2 class="text-center mb-5 font-weight-bold">What We Offer</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li class="mb-3">✅ Expert Choice Filling Guidance</li>
+                    <li class="mb-3">✅ Real-time Cutoff Updates</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <ul class="list-unstyled">
+                    <li class="mb-3">✅ Category Benefit Optimization</li>
+                    <li class="mb-3">✅ MCC, JOSAA & CSAB Support</li>
+                </ul>
+            </div>
         </div>
     </div>
 
+    <!-- Refund Policy Section -->
+    <div id="refund" class="bg-light py-5 border-top border-bottom">
+        <div class="container text-center">
+            <h2 class="mb-4 font-weight-bold">Refund Policy</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8">
+                    <p class="lead text-secondary mb-0" style="line-height: 1.8;">
+                        You can get a refund of <strong>80%</strong> if you cancel in your first week of counselling by texting <span class="badge badge-dark font-weight-bold px-2 py-1">"CANCEL COUNSELLING"</span>. And likewise <strong>50%</strong> in the 2nd week but that would be it following no refund by the 3rd week. And across all over India, only our counselling provides refund so choose wisely.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Govt Act Section -->
+    <div id="govt-act" class="container py-5 border-bottom">
+        <h2 class="text-center font-weight-bold mb-4">Government Regulatory Compliance</h2>
+        <p class="text-center text-muted mb-5">Our data handling pipelines process profiles securely within recognized statutory provisions:</p>
+        <div class="row text-center font-weight-bold text-secondary">
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-white shadow-sm">🛡️ IT Act, 2000</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-white shadow-sm">📊 DPDP Act, 2023</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-white shadow-sm">⚖️ Consumer Protection Act, 2019</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-white shadow-sm">🎨 Copyright Act, 1957</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-white shadow-sm">🏷️ Trademarks Act, 1999</div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="p-3 border rounded bg-white shadow-sm">📜 Indian Penal Code (IPC)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admission Toolkit -->
+    <section id="toolkit" class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="font-weight-bold">Admissions Toolkit</h2>
+                <p class="text-muted">Direct access tools to monitor historical official allocations.</p>
+            </div>
+
+            <div class="row">
+                <!-- Card 1: JoSAA / CSAB -->
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="resource-card p-3 h-100 text-center d-flex flex-column justify-content-between bg-white shadow-sm">
+                        <div>
+                            <div class="icon-box mb-2">🏛️</div>
+                            <h6 class="font-weight-bold text-uppercase tracking-wider text-primary">JoSAA / CSAB</h6>
+                            <p class="small text-muted mb-0">Official Engineering Opening & Closing Archive.</p>
+                        </div>
+                        <a href="https://josaa.admissions.nic.in/applicant/seatmatrix/openingclosingrankarchieve.aspx" target="_blank" class="btn btn-outline-primary btn-sm btn-block mt-3">Open Archives</a>
+                    </div>
+                </div>
+
+                <!-- Card 2: MCC -->
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="resource-card p-3 h-100 text-center d-flex flex-column justify-content-between bg-white shadow-sm">
+                        <div>
+                            <div class="icon-box mb-2">🩺</div>
+                            <h6 class="font-weight-bold text-uppercase tracking-wider text-success">MCC Portal</h6>
+                            <p class="small text-muted mb-0">Central 15% All India Quota medical metrics.</p>
+                        </div>
+                        <a href="https://mcc.nic.in/" target="_blank" class="btn btn-outline-success btn-sm btn-block mt-3">Open MCC Web</a>
+                    </div>
+                </div>
+
+                <!-- Card 3: State Eng -->
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="resource-card p-3 h-100 text-center d-flex flex-column justify-content-between bg-white shadow-sm">
+                        <div>
+                            <div class="icon-box mb-2">⚙️</div>
+                            <h6 class="font-weight-bold text-uppercase tracking-wider text-dark">State Eng</h6>
+                            <p class="small text-muted mb-0">State engineering matrix rank parameters.</p>
+                        </div>
+                        <a href="https://engineering.careers360.com/articles/jee-main-rank-vs-percentile" target="_blank" class="btn btn-outline-dark btn-sm btn-block mt-3">Check Rank Trends</a>
+                    </div>
+                </div>
+
+                <!-- Card 4: State Med -->
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="resource-card p-3 h-100 text-center d-flex flex-column justify-content-between bg-white shadow-sm">
+                        <div>
+                            <div class="icon-box mb-2">🧪</div>
+                            <h6 class="font-weight-bold text-uppercase tracking-wider text-info">State Quota</h6>
+                            <p class="small text-muted mb-0">State-wise institutional medical parameters.</p>
+                        </div>
+                        <a href="https://www.neetugguidance.in/state-institute.php?colser_id=7&coldesc_id=1" target="_blank" class="btn btn-outline-info btn-sm btn-block mt-3">View State Rules</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Packages Section -->
+    <section id="pricing" class="py-5 bg-white border-bottom">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="font-weight-bold">Counselling Packages</h2>
+            </div>
+
+            <!-- Row 1 -->
+            <div class="row justify-content-center">
+                <div class="col-md-5 mb-4">
+                    <div class="resource-card p-4 bg-white h-100 border-primary shadow-sm" style="border-width: 2px;">
+                        <div class="text-center d-flex flex-column h-100">
+                            <h4 class="font-weight-bold">JoSAA Specialist</h4>
+                            <p class="text-muted small">IIT / NIT / IIIT Focus</p>
+                            <hr>
+                            <div class="my-3">
+                                <span class="display-4 font-weight-bold">₹15,000</span>
+                            </div>
+                            <ul class="list-unstyled text-left mb-4">
+                                <li>✅ Everything in "All-in-One"</li>
+                                <li>✅ <strong>Complete JoSAA & CSAB Support</strong></li>
+                                <li>✅ High-Stakes Choice Preference Lists</li>
+                                <li>✅ Direct Expert Consultation</li>
+                            </ul>
+                            <a href="https://forms.gle/iaE8jPfoCtaCf6f89" class="btn btn-primary mt-auto btn-block">Get Premium Support</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 mb-4">
+                    <div class="resource-card p-4 bg-white h-100 border-warning shadow-sm" style="border-width: 2px;">
+                        <div class="text-center d-flex flex-column h-100">
+                            <h4 class="font-weight-bold ">All-in-One Package</h4>
+                            <p class="text-muted small">Excluding JoSAA</p>
+                            <hr>
+                            <div class="my-3">
+                                <span class="display-4 font-weight-bold">₹7,500</span>
+                            </div>
+                            <ul class="list-unstyled text-left mb-4">
+                                <li>✅ AKTU / UPTAC Counselling</li>
+                                <li>✅ All Private College Counselling</li>
+                                <li>✅ State Level University Support</li>
+                                <li>✅ Choice Filling & Rank Analysis</li>
+                            </ul>
+                            <a href="https://forms.gle/iaE8jPfoCtaCf6f89" class="btn btn-warning mt-auto font-weight-bold">Enroll Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2 -->
+            <div class="row justify-content-center">
+                <div class="col-md-5 mb-4">
+                    <div class="resource-card p-4 bg-white h-100 border-primary shadow-sm" style="border-width: 2px;">
+                        <div class="text-center d-flex flex-column h-100">
+                            <h4 class="font-weight-bold ">NEET UG MCC</h4>
+                            <div class="my-2"><span class="display-4 font-weight-bold">₹20,000</span></div>
+                            <ul class="list-unstyled text-left my-3 text-secondary small">
+                                <li class="mb-2">✅ Complete MCC 15% AIQ & State Quota Medical Mapping</li>
+                                <li class="mb-2">✅ Integrated State Level University Selection Trees</li>
+                            </ul>
+                            <a href="https://forms.gle/iaE8jPfoCtaCf6f89" class="btn btn-primary mt-auto btn-block">Enroll Track</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5 mb-4">
+                    <div class="resource-card p-4 bg-white h-100 border-warning shadow-sm" style="border-width: 2px;">
+                        <div class="text-center d-flex flex-column h-100">
+                            <h4 class="font-weight-bold">NEET UG State Medical</h4>
+                            <div class="my-2"><span class="display-4 font-weight-bold">₹15,000</span></div>
+                            <ul class="list-unstyled text-left my-3 text-secondary small">
+                                <li class="mb-2">✅ INEET State Quota Made Simple. Get Expert Choice-Filling Lists Now.</li>
+                                <li class="mb-2">✅ IIntegrated State Level University Selection Trees</li>
+                            </ul>
+                            <a href="https://forms.gle/iaE8jPfoCtaCf6f89" class="btn btn-warning mt-auto btn-block text-dark font-weight-bold">Get Ultimate Support</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Form Block -->
+    <section id="registration" class="py-5 bg-light">
+        <div class="container">
+            <div class="cta-banner p-5 text-center text-white rounded">
+                <h3 class="font-weight-bold mb-3">Registration Form</h3>
+                <p class="lead mb-4">Let seasoned specialists construct your final custom choices layout.</p>
+                <a href="https://forms.gle/iaE8jPfoCtaCf6f89" target="_blank" class="btn btn-warning btn-lg px-5 shadow-lg font-weight-bold">Access Registration Form</a>
+                <div class="mt-4 p-3 bg-dark rounded border border-secondary text-left d-inline-block text-light" style="max-width: 600px; font-size: 0.9rem;">
+                    ⏱️ <strong>Timeline:</strong> Our operations team initiates structural contact within <strong>48 Hours</strong>.<br>
+                    ⚠️ <strong>Important Note:</strong> Official formal personal counselling support sequence initiates exclusively following successful payment clearance.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Success Stories -->
+    <section id="success-stories" class="py-5 bg-secondary text-white">
+        <div class="container">
+            <h2 class="text-center mb-5 font-weight-bold">Success Stories</h2>
+            <div class="row text-dark">
+                <div class="col-md-6 mb-4">
+                    <div class="testimonial-card">
+                        <img class="testimonial-img" src="https://cdn.phototourl.com/free/2026-07-16-5311d8c0-1a5e-409b-8d1f-c29b67d35cf7.png" alt="Student">
+                        <p class="testimonial-text">"I am khushal mishra from ALLAHABAD UNIVERSITY and I thank you to team of KAMAL COUNSELLING."</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="testimonial-card">
+                        <img class="testimonial-img" src="https://cdn.phototourl.com/free/2026-07-16-7e97e81e-4887-4cb3-ad0d-7f3263068056.png" alt="Student">
+                        <p class="testimonial-text">"I am JOY from West Bengal and I am currently in AIIMS RISHIKESH and all credit goes to KAMAL COUNSELLING For securing my seat into my dream college."</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="testimonial-card">
+                        <img class="testimonial-img" src="https://cdn.phototourl.com/free/2026-07-16-cec8bd64-cb13-4e3c-9425-c0bb67f629b2.png">
+                        <p class="testimonial-text">I am Raghav Singh from GMC UP and I thank you to the Team of KAMAL COUNSELLING it was a great work Guys just because of Kamal counselling, I am in my deserving college.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="testimonial-card">
+                        <img class="testimonial-img" src="https://image2url.com/r2/default/images/1773300819373-701aa867-bdc8-4021-8d4f-3e12ea6deb5e.jpg">
+                        <p class="testimonial-text">I am Aayush Raj and I am in BITS PILANI . All thanks to Kamal Counselling.</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="testimonial-card">
+                        <img class="testimonial-img" src="https://image2url.com/r2/default/images/1773300997376-e43255ee-5416-41bd-9c93-b183078df29a.jpg">
+                        <p class="testimonial-text">I am Ayush rajak and I am in IIIT BHOPAL. All thanks to Kamal Counselling..</p>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="testimonial-card">
+                        <img class="testimonial-img" src="https://user4268.na.imgto.link/public/20260312/05fad6aa-e39f-45a8-940d-837114c3b872.avif" alt="Student">
+                        <p class="testimonial-text">"Allocated safely into <strong>IIT ROORKEE</strong> under continuous optimization metrics. All thanks to Kamal Counselling." - Girish Gupta</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team & Contact Directory -->
+    <section class="py-5 bg-white border-top">
+        <div class="container">
+            <h2 class="text-center mb-5 font-weight-bold">Our Core Profiles</h2>
+            <div class="row justify-content-center">
+                <!-- Profile 1: Founder -->
+                <div class="col-md-4 mb-4">
+                    <div class="p-3 border rounded shadow-sm d-flex align-items-center bg-light contact-btn">
+                        <img class="testimonial-img" src="https://cdn.phototourl.com/free/2026-07-16-5dff6873-396e-481c-ad64-fee56aff2b96.png" alt="Founder">
+                        <div>
+                            <span class="badge badge-dark mb-1">1) Founder</span>
+                            <h6 class="font-weight-bold mb-1">MR. A. N. J</h6>
+                            <p class="small mb-2">
+                                <a href="mailto:kamalcounselling04@gmail.com" class="text-secondary font-weight-bold text-decoration-none">
+                                    <i class="fas fa-envelope gmail-icon-custom mr-1"></i>Email Us
+                                </a>
+                            </p>
+                            <a href="https://www.linkedin.com/in/mr-a-n-j-9656a7422?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="btn btn-sm btn-primary py-0 px-2" style="font-size: 0.75rem;">
+                                <i class="fab fa-linkedin mr-1"></i>LinkedIn
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Profile 2: Co-founder -->
+                <div class="col-md-4 mb-4">
+                    <div class="p-3 border rounded shadow-sm d-flex align-items-center bg-light">
+                        <img class="testimonial-img" src="https://cdn.phototourl.com/free/2026-07-16-5e281be5-04b5-4225-b5d5-d5acbdbfdd3c.png" alt="Co-Founder">
+                        <div>
+                            <span class="badge badge-dark mb-1">2) Co-Founder</span>
+                            <h6 class="font-weight-bold mb-1">MR. NITESH</h6>
+                            <p class="small text-muted mb-0">
+                                Contact:
+                                <a href="tel:+919352025736" class="text-primary font-weight-bold text-decoration-none">
+                                    <i class="fas fa-phone-alt mr-1"></i>+91 93520 25736
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Profile 3: Counselling Mentor -->
+                <div class="col-md-4 mb-4">
+                    <div class="p-3 border rounded shadow-sm d-flex align-items-center bg-light">
+                        <img class="testimonial-img" src="https://cdn.phototourl.com/free/2026-07-16-d7ef97f2-0d82-456b-a07b-1ce7360312fd.png" alt="Mentor">
+                        <div>
+                            <span class="badge badge-dark mb-1">3) Advisory Expert</span>
+                            <h6 class="font-weight-bold mb-1">MR. MALIK</h6>
+                            <p class="small text-muted mb-0">
+                                Contact:
+                                <a href="tel:+919991991674" class="text-primary font-weight-bold text-decoration-none">
+                                    <i class="fas fa-phone-alt mr-1"></i>+91 99919 91674
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 text-center">
+        <div class="container">
+            <p class="mb-1 small opacity-75">© 2026 Kamal Counselling. All Rights Reserved. Compliant under Information Technology Act 2000 & Digital Personal Data Protection (DPDP) Act 2023.</p>
+            <p class="mb-3 small opacity-75">Helpline: <span class="text-light font-weight-bold">kamalcounselling04@gmail.com</span></p>
+
+            <!-- Bottom Social Section with Gmail and LinkedIn Logos -->
+            <div class="mt-2">
+                <a href="mailto:kamalcounselling04@gmail.com" class="footer-social-btn gmail-btn" title="Send Email via Gmail">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                <a href="https://www.linkedin.com/in/mr-a-n-j-9656a7422?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="footer-social-btn linkedin-btn" title="Connect with our Founder on LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <div class="small text-muted mt-2">Connect Directly with Founder MR. A. N. J</div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
-  // 1. Typewriter
-        const phrases = ["DEVELOPER", "UI DESIGNER", "CYBER ARCHITECT"];
-        let pIdx = 0, cIdx = 0, isDeleting = false;
+        const text = "Welcome to KAMAL COUNSELLING";
+        let index = 0;
+
         function type() {
-            const el = document.getElementById('typewriter');
-            const current = phrases[pIdx];
-            el.textContent = isDeleting ? current.substring(0, cIdx--) : current.substring(0, cIdx++);
-            if (!isDeleting && cIdx > current.length) { isDeleting = true; setTimeout(type, 2000); }
-            else if (isDeleting && cIdx === 0) { isDeleting = false; pIdx = (pIdx + 1) % phrases.length; setTimeout(type, 500); }
-            else setTimeout(type, isDeleting ? 50 : 150);
-        }
-
-        // 2. Real AI Bot Logic
-        async function botReply(text) {
-            const messages = document.getElementById('chat-messages');
-            const botDiv = document.createElement('div');
-            botDiv.className = "bot-msg";
-            botDiv.innerHTML = "SYS: ANALYZING...";
-            messages.appendChild(botDiv);
-            messages.scrollTop = messages.scrollHeight;
-
-            try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
-                });
-                const data = await response.json();
-                const aiResponse = data.reply;
-
-                botDiv.innerHTML = "SYS: ";
-                let i = 0;
-                const interval = setInterval(() => {
-                    botDiv.innerHTML += aiResponse.charAt(i++);
-                    if (i >= aiResponse.length) { clearInterval(interval); messages.scrollTop = messages.scrollHeight; }
-                }, 15);
-            } catch (err) {
-                botDiv.innerHTML = "SYS: ERROR_UPLINK_FAILED.";
+            if (index < text.length) {
+                document.getElementById("typewriter").innerHTML = text.slice(0, index + 1) + '<span class="cursor">|</span>';
+                index++;
+                setTimeout(type, 80);
             }
         }
 
-        // 3. Initialization & Listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            type();
-            const hero = document.querySelector('.hero');
-            const btn = document.getElementById('cta-btn');
-            const scene = document.getElementById('projects-scene');
-            const carousel = document.getElementById('carousel');
+        window.onload = type;
 
-            window.addEventListener('mousemove', (e) => {
-                hero.style.setProperty('--mouse-x', `${(e.clientX/window.innerWidth)*100}%`);
-                hero.style.setProperty('--mouse-y', `${(e.clientY/window.innerHeight)*100}%`);
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
             });
-
-            btn.onclick = () => {
-                btn.style.display = 'none';
-                document.getElementById('status-msg').innerText = "> Initializing 3D Orbital Grid...";
-                setTimeout(() => { document.getElementById('status-msg').style.display = 'none'; scene.style.display = 'block'; }, 1500);
-            };
-
-            // 3D Rotation
-            let isDragging = false, startX = 0, rotation = 0, targetRot = 0;
-            const start = (e) => { isDragging = true; startX = e.pageX || e.touches[0].pageX; };
-            const move = (e) => {
-                if (!isDragging) return;
-                const x = e.pageX || e.touches[0].pageX;
-                const walk = (x - startX) * 0.4;
-                carousel.style.transform = `rotateY(${rotation + walk}deg)`;
-                targetRot = rotation + walk;
-            };
-            const end = () => { isDragging = false; rotation = targetRot; };
-
-            window.addEventListener('mousedown', start); window.addEventListener('mousemove', move); window.addEventListener('mouseup', end);
-
-            // Chat UI
-            const chatToggle = document.getElementById('chat-toggle');
-            const chatWin = document.getElementById('chat-window');
-            const chatInput = document.getElementById('chat-input');
-            const sendBtn = document.getElementById('send-btn');
-
-            chatToggle.onclick = () => chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
-            
-            const sendMsg = () => {
-                const text = chatInput.value; if(!text) return;
-                document.getElementById('chat-messages').innerHTML += `<div class="user-msg">> ${text}</div>`;
-                chatInput.value = "";
-                botReply(text);
-            };
-            sendBtn.onclick = sendMsg;
-            chatInput.onkeypress = (e) => { if(e.key === 'Enter') sendMsg(); };
         });
     </script>
 </body>
+
 </html>
